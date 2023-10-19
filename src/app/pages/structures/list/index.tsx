@@ -71,10 +71,10 @@ export default function StructureList() {
                         console.info(event, row.id);
                     },
                     sx: {
-                        cursor: 'pointer', //you might want to change the cursor too when adding an onClick
+                        cursor: 'pointer',
                     },
                 })}
-                getRowId={(originalRow, index, parentRow): string => {
+                getRowId={(originalRow): string => {
                     return originalRow.id
                 }}
             />
