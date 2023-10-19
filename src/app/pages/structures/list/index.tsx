@@ -1,4 +1,3 @@
-import {Container} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {defaultPaginatedResponse, PaginatedResponse} from "../../../api/model";
 import {endpoints} from "../../../api/endpoints";
