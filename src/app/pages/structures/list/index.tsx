@@ -1,7 +1,10 @@
 import {Container} from "react-bootstrap";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {defaultPaginatedResponse, PaginatedResponse} from "../../../api/model";
+import {endpoints} from "../../../api/endpoints";
+import {MaterialReactTable, MRT_ColumnDef} from "material-react-table";
 
-interface ITableRow {
+interface StructureInfo {
     id: string;
     name: string;
     fieldsAmount: number;
@@ -10,22 +13,71 @@ interface ITableRow {
 }
 
 export default function StructureList() {
-    const [data, setData] = useState<ITableRow[]>([])
-
-    const fetchData = async (e?: any) => {
-            try {
-                const response = await fetch('http://localhost:8080/structures')
-                const jsonData = await response.json()
-                setData(jsonData)
-            } catch (error) {
-                console.error(error)
+    const [data, setData] = useState<PaginatedResponse<StructureInfo>>(defaultPaginatedResponse<StructureInfo>())
+    const columns: MRT_ColumnDef<StructureInfo>[] = [
+        {
+            accessorKey: 'id',
+            header: 'Id',
+            enableHiding: true,
+        },
+        {
+            accessorKey: 'name',
+            header: 'Nazwa',
+            enableColumnFilter: true
+        },
+        {
+            accessorKey: 'fieldsAmount',
+            header: 'Ilość pól',
+            enableColumnFilter: false
+        },
+        {
+            accessorKey: 'creationDate',
+            header: 'Data utworzenia',
+            enableColumnFilter: false
+        },
+        {
+            accessorKey: 'updateDate',
+            header: 'Data aktualizacji',
+            enableColumnFilter: false
         }
+    ]
+
+    const fetchData = () => {
+        fetch(endpoints.structureList)
+            .then(response => {
+                return response.json()
+            }).then(json => {
+            setData(json)
+        })
     }
 
-    return (
-        <Container>
-            <p>hello from structure list</p>
+    useEffect(() => {
+        fetchData()
+    }, []);
 
-        </Container>
+    return (
+        <div className={'m-5'}>
+            <MaterialReactTable
+                columns={columns} data={data.rows}
+                enableHiding={true} enableTopToolbar={false} enableColumnActions={true}
+                    state={{
+                    showColumnFilters: true,
+                    columnVisibility: {
+                        id: false
+                    }
+                }}
+                muiTableBodyRowProps={({ row }) => ({
+                    onClick: (event) => {
+                        console.info(event, row.id);
+                    },
+                    sx: {
+                        cursor: 'pointer', //you might want to change the cursor too when adding an onClick
+                    },
+                })}
+                getRowId={(originalRow, index, parentRow): string => {
+                    return originalRow.id
+                }}
+            />
+        </div>
     )
 }
