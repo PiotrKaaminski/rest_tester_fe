@@ -1,12 +1,6 @@
 import {useEffect, useState} from "react";
-import {defaultPaginatedResponse, PaginatedResponse} from "../../../api/model";
-import {
-    StructureValidationError,
-    StructureValidationErrorResponse,
-    CreateOrUpdateStructureRequest,
-    endpoints,
-    StructureInfo
-} from "../../../api/endpoints/structures";
+import {defaultPaginatedResponse, PaginatedResponse} from "../../../api/model/common";
+import {endpoints} from "../../../api/endpoints/structures";
 import {MaterialReactTable, type MRT_ColumnDef, MRT_Row} from "material-react-table";
 import {
     Box,
@@ -22,6 +16,13 @@ import {
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {useNavigate} from "react-router-dom";
+import {
+    CreateOrUpdateStructureRequest,
+    StructureInfo,
+    StructureValidationError,
+    StructureValidationErrorResponse
+} from "../../../api/model/structures";
+import {formatDate} from "../../../utils";
 
 interface ModalState {
     open: boolean
@@ -87,6 +88,7 @@ export default function StructureList() {
         },
         {
             accessorKey: 'creationDate',
+            accessorFn: (structureInfo) => formatDate(structureInfo.creationDate),
             header: 'Data utworzenia',
             enableColumnFilter: false,
             enableEditing: false,
@@ -94,6 +96,7 @@ export default function StructureList() {
         },
         {
             accessorKey: 'updateDate',
+            accessorFn: (structureInfo) => formatDate(structureInfo.updateDate),
             header: 'Data aktualizacji',
             enableColumnFilter: false,
             enableEditing: false,
@@ -234,11 +237,11 @@ export const CreateOrUpdateModal = ({
     }, [state.open])
 
     const errorInfoMap: Record<StructureValidationError, string> = {
-        [StructureValidationError.INTERNAL_SERVER_ERROR]: 'Wystąpił nieoczekiwany błąd',
-        [StructureValidationError.NAME_EMPTY]: 'Nazwa jest pusta',
-        [StructureValidationError.NAME_CONTAINS_WHITESPACE]: 'Nazwa zawiera biały znak',
-        [StructureValidationError.NAME_NOT_UNIQUE]: 'Nazwa nie jest unikalna',
-        [StructureValidationError.NAME_TOO_LONG]: 'Nazwa jest za długa'
+        INTERNAL_SERVER_ERROR: 'Wystąpił nieoczekiwany błąd',
+        NAME_EMPTY: 'Nazwa jest pusta',
+        NAME_CONTAINS_WHITESPACE: 'Nazwa zawiera biały znak',
+        NAME_NOT_UNIQUE: 'Nazwa nie jest unikalna',
+        NAME_TOO_LONG: 'Nazwa jest za długa'
     }
 
     const errorInfo: string | null = validationError == null ? null : errorInfoMap[validationError]
