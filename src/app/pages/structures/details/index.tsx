@@ -1,21 +1,23 @@
 import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {StructureDetails, StructureDetailsField} from "../../../api/model/structures";
+import {CreateOrUpdateStructureRequest, StructureDetails, StructureDetailsField} from "../../../api/model/structures";
 import {endpoints} from "../../../api/endpoints/structures";
 import {formatDate} from "../../../utils";
-import {MaterialReactTable, MRT_ColumnDef} from "material-react-table";
+import {MaterialReactTable, MRT_ColumnDef, MRT_Row} from "material-react-table";
 import {
     CreateOrUpdateStructureFieldRequest,
     StructureFieldType,
-    StructureFieldValidationError
+    StructureFieldValidationError, StructureFieldValidationErrorResponse
 } from "../../../api/model/structureField";
+import Select from "@mui/material/Select"
+import MenuItem from "@mui/material/MenuItem"
 import {
     Box,
     Button,
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
+    DialogTitle, FormControl,
     IconButton,
     Stack,
     TextField,
@@ -24,9 +26,9 @@ import {
 import {Delete, Edit} from "@mui/icons-material";
 
 const fieldTypeTextMap: Record<StructureFieldType, string> = {
-    [StructureFieldType.STRING]: 'Znakowy',
-    [StructureFieldType.NUMBER]: 'Liczbowy',
-    [StructureFieldType.BOOLEAN]: 'Boolowski'
+    STRING: 'Znakowy',
+    NUMBER: 'Liczbowy',
+    BOOLEAN: 'Boolowski'
 }
 
 interface StructureFieldModalState {
@@ -44,15 +46,21 @@ export default function StructureDetailsView() {
         initialData: null
     })
     const [structure, setStructure] = useState<StructureDetails>();
+    const [descriptionState, setDescriptionState] = useState<'VIEW' | 'MODIFY'>('VIEW')
+    const [newDescriptionValue, setNewDescriptionValue] = useState<string>('')
     const { id } = useParams();
 
-    useEffect( () => {
+    const fetchData = async () => {
         if (!id) return
-        fetch(endpoints.structure(id))
+        fetch(endpoints.structures.withId(id))
             .then(response => response.json())
             .then(structure => {
                 setStructure(structure)
             })
+    }
+
+    useEffect( () => {
+        fetchData()
     }, [id])
 
     const fieldColumns: MRT_ColumnDef<StructureDetailsField>[] = [
@@ -89,6 +97,71 @@ export default function StructureDetailsView() {
             enableColumnFilter: false,
         }
     ]
+
+    const handleCreateField = async (newField: CreateOrUpdateStructureFieldRequest): Promise<StructureFieldValidationError | null> => {
+        if (!id) return null;
+        const response = await fetch(endpoints.structureFields.withStructurePrefix(id), {
+            method: 'POST',
+            body: JSON.stringify(newField),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        if (response.ok) {
+            fetchData();
+            return null;
+        }
+        const errorResponse = await response.json() as StructureFieldValidationErrorResponse
+        return errorResponse.status
+    }
+
+    const handleUpdateField = async (newField: CreateOrUpdateStructureFieldRequest, fieldId: string): Promise<StructureFieldValidationError | null> => {
+        if (!id) return null;
+        const response = await fetch(endpoints.structureFields.withId(fieldId), {
+            method: 'PATCH',
+            body: JSON.stringify(newField),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        if (response.ok) {
+            fetchData();
+            return null;
+        }
+        const errorResponse = await response.json() as StructureFieldValidationErrorResponse
+        return errorResponse.status
+    }
+
+    const handleDeleteField = async (row: MRT_Row<StructureDetailsField>)=> {
+        // eslint-disable-next-line no-restricted-globals
+        if (!confirm(`Jesteś pewny, że chcesz usunąć polke ${row.original.name}?`)) {
+            return;
+        }
+        await fetch(endpoints.structureFields.withId(row.id), {
+            method: 'DELETE'
+        })
+        fetchData()
+    }
+
+    const initiateDescriptionUpdate = () => {
+        setNewDescriptionValue(structure?.description ?? '')
+        setDescriptionState('MODIFY')
+    }
+
+    const handleDescriptionUpdate = async () => {
+        if (!id) return null;
+        const body = new CreateOrUpdateStructureRequest(null, newDescriptionValue)
+        await fetch(endpoints.structures.withId(id), {
+            method: 'PATCH',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        setDescriptionState('VIEW')
+        fetchData()
+    }
+
     return (
         <>
             <div className={'container mt-5'}>
@@ -100,8 +173,19 @@ export default function StructureDetailsView() {
                     <li><b>Data aktualizacji:</b> {formatDate(structure?.updateDate)}</li>
                 </ul>
                 <h4 className={'mt-4'}>Opis:</h4>
-                <p>{structure?.description}</p>
-                <button className={'btn btn-primary mt-4'}>Edycja opisu</button>
+                {descriptionState === 'VIEW' && (
+                    <>
+                        <p style={{whiteSpace: 'pre-wrap'}}>{structure?.description}</p>
+                        <button className={'btn btn-primary mt-3'} onClick={() => initiateDescriptionUpdate()}>Edycja opisu</button>
+                    </>
+                )}
+                {descriptionState === 'MODIFY' && (
+                    <>
+                        <textarea style={{width: '100%', height: '200px'}} defaultValue={structure?.description} onChange={(e) => {setNewDescriptionValue(e.target.value)}}/>
+                        <button className={'btn btn-warning mt-3'} onClick={() => setDescriptionState('VIEW')}>Anuluj</button>
+                        <button className={'btn btn-success mt-3 ms-3'} onClick={() => handleDescriptionUpdate()}>Zapisz</button>
+                    </>
+                )}
                 <h4 className={'mt-4'}>Pola:</h4>
             </div>
             <div className={'m-5 mt-4'}>
@@ -135,21 +219,22 @@ export default function StructureDetailsView() {
                         <Box sx={{ display: 'flex', gap: '1rem'}}>
                             <Tooltip title={"Edytuj"} arrow={true} placement={'left'}>
                                 <IconButton
-                                    // onClick={() => setModalState({
-                                    //     open: true,
-                                    //     reason: `UPDATE`,
-                                    //     onSubmit: (updatedStructure) => handleUpdateRow(updatedStructure, row.id),
-                                    //     currentName: row.original.name
-                                    // })}>
-                                    >
+                                    onClick={() => setStructureFieldModalState({
+                                        open: true,
+                                        reason: `UPDATE`,
+                                        onSubmit: (updatedStructure) => handleUpdateField(updatedStructure, row.id),
+                                        initialData: {
+                                            name: row.original.name,
+                                            type: row.original.type
+                                        }
+                                    })}>
                                     <Edit />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title={"Usuń"} arrow={true} placement={'left'}>
                                 <IconButton
                                     // todo prawdopodobnie zamienić na modal zamiast confirm
-                                    // onClick={() => handleDeleteRow(row)}>
-                                    >
+                                    onClick={() => handleDeleteField(row)}>
                                     <Delete/>
                                 </IconButton>
                             </Tooltip>
@@ -161,7 +246,7 @@ export default function StructureDetailsView() {
                             onClick={() => setStructureFieldModalState({
                                 open: true,
                                 reason: 'CREATE',
-                                onSubmit: async () => null,
+                                onSubmit: handleCreateField,
                                 initialData: null
                             })}
                             variant={"contained"}>
@@ -190,15 +275,17 @@ export const StructureFieldModal = ({
     const [name, setName] = useState<string>(state.initialData?.name ?? '')
     const [type, setType] = useState<StructureFieldType>(state.initialData?.type ?? StructureFieldType.STRING)
     const [nameValidationError, setNameValidationError] = useState<StructureFieldValidationError | null>(null)
-    const [typeValidationError, setTypeValidationError] = useState<StructureFieldValidationError | null>(null)
 
     useEffect(() => {
         if (!state.open) {
             setNameValidationError(null)
-            setTypeValidationError(null)
         }
     }, [state.open])
 
+    useEffect(() => {
+        setName(state.initialData?.name ?? '')
+        setType(state.initialData?.type ?? StructureFieldType.STRING)
+    }, [state.initialData])
     const nameErrorInfoMap = new Map<StructureFieldValidationError, string> ([
         [StructureFieldValidationError.NAME_CONTAINS_WHITESPACE, "Nazwa zawiera biały znak"],
         [StructureFieldValidationError.NAME_EMPTY, "Nazwa jest pusta"],
@@ -206,16 +293,12 @@ export const StructureFieldModal = ({
         [StructureFieldValidationError.NAME_TOO_LONG, "Nazwa jest za długa"]
     ])
 
-    const typeErrorInfoMap = new Map<StructureFieldValidationError, string> ([
-        [StructureFieldValidationError.TYPE_EMPTY, "Typ jest pusty"]
-    ])
-
     const handleSubmit = async () => {
         if (name.indexOf(' ') >= 0) {
             setNameValidationError(StructureFieldValidationError.NAME_CONTAINS_WHITESPACE)
             return
         }
-        if (name == '') {
+        if (name === '') {
             setNameValidationError(StructureFieldValidationError.NAME_EMPTY)
             return
         }
@@ -223,15 +306,10 @@ export const StructureFieldModal = ({
         if (error == null) {
             onClose()
         }
-        if (error == StructureFieldValidationError.TYPE_EMPTY) {
-            setTypeValidationError(error)
-        } else {
-            setNameValidationError(error)
-        }
+        setNameValidationError(error)
     }
 
     const nameErrorInfo: string | undefined = nameValidationError == null ? undefined : nameErrorInfoMap.get(nameValidationError)
-    const typeErrorInfo: string | undefined = typeValidationError == null ? undefined : typeErrorInfoMap.get(typeValidationError)
 
     const title = state.reason === 'CREATE' ? 'Nowe pole' : 'Aktualizacja pola'
     const submitLabel = state.reason === 'CREATE' ? 'Dodaj' : 'Aktualizuj'
@@ -240,7 +318,7 @@ export const StructureFieldModal = ({
         <Dialog open={state.open}>
             <DialogTitle textAlign={"center"}>{title}</DialogTitle>
             <DialogContent>
-                <form onSubmit={(e) => e.preventDefault()}>
+                <FormControl>
                     <Stack
                         sx={{
                             width: '100%',
@@ -256,22 +334,30 @@ export const StructureFieldModal = ({
                             helperText={nameErrorInfo}
                             defaultValue={state.initialData?.name}
                             onChange={(e) => {
-                                console.log(e.target.value)
+                                if (e.target.value.indexOf(' ') >= 0) {
+                                    setNameValidationError(StructureFieldValidationError.NAME_CONTAINS_WHITESPACE)
+                                } else if (e.target.value === '') {
+                                    setNameValidationError(StructureFieldValidationError.NAME_EMPTY)
+                                } else {
+                                    setNameValidationError(null);
+                                }
+                                setName(e.target.value)
                             }}
                         />
-                        <TextField
+                        <Select
                             key={'type'}
-                            label={'Typ'}
                             name={'type'}
-                            error={typeValidationError != null}
-                            helperText={typeErrorInfo}
-                            defaultValue={state.initialData?.type}
-                            onChange={(e) => {
-                                console.log(e.target.value)
+                            defaultValue={state.initialData?.type ?? StructureFieldType.STRING}
+                            onChange={(event) => {
+                                setType(event.target.value as StructureFieldType)
                             }}
-                        />
+                        >
+                            <MenuItem value={StructureFieldType.STRING}>{fieldTypeTextMap[StructureFieldType.STRING]}</MenuItem>
+                            <MenuItem value={StructureFieldType.NUMBER}>{fieldTypeTextMap[StructureFieldType.NUMBER]}</MenuItem>
+                            <MenuItem value={StructureFieldType.BOOLEAN}>{fieldTypeTextMap[StructureFieldType.BOOLEAN]}</MenuItem>
+                        </Select>
                     </Stack>
-                </form>
+                </FormControl>
             </DialogContent>
             <DialogActions sx={{p: '1.25rem'}}>
                 <Button onClick={onClose}>Anuluj</Button>

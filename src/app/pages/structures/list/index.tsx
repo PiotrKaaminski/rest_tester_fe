@@ -41,7 +41,7 @@ export default function StructureList() {
     const [data, setData] = useState<PaginatedResponse<StructureInfo>>(defaultPaginatedResponse<StructureInfo>())
     const navigate = useNavigate();
     const fetchData = async () => {
-        const response = await fetch(endpoints.structures);
+        const response = await fetch(endpoints.structures.base);
         const json = await response.json();
         setData(json);
     }
@@ -105,7 +105,7 @@ export default function StructureList() {
     ]
 
     const handleCreateNewRow = async (newStructure: CreateOrUpdateStructureRequest): Promise<StructureValidationError | null> => {
-        const response = await fetch(endpoints.structures, {
+        const response = await fetch(endpoints.structures.base, {
             method: 'POST',
             body: JSON.stringify(newStructure),
             headers: {
@@ -121,7 +121,7 @@ export default function StructureList() {
     }
 
     const handleUpdateRow = async (updatedStructure: CreateOrUpdateStructureRequest, id: string): Promise<StructureValidationError | null> => {
-        const response = await fetch(endpoints.structure(id), {
+        const response = await fetch(endpoints.structures.withId(id), {
             method: 'PATCH',
             body: JSON.stringify(updatedStructure),
             headers: {
@@ -141,7 +141,7 @@ export default function StructureList() {
         if (!confirm(`Jesteś pewny, że chcesz usunąć strukturę ${row.original.name}?`)) {
             return;
         }
-        await fetch(endpoints.structure(row.id), {
+        await fetch(endpoints.structures.withId(row.id), {
             method: 'DELETE'
         })
         fetchData()
@@ -236,6 +236,9 @@ export const CreateOrUpdateModal = ({
         }
     }, [state.open])
 
+    useEffect(() => {
+        setName(state.currentName)
+    }, [state.currentName])
     const errorInfoMap: Record<StructureValidationError, string> = {
         INTERNAL_SERVER_ERROR: 'Wystąpił nieoczekiwany błąd',
         NAME_EMPTY: 'Nazwa jest pusta',
