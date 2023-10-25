@@ -15,5 +15,8 @@ export const endpoints = {
         withStructurePrefix: (structureId: string): string => {
             return endpoints.structures.withId(structureId) + `/fields`
         }
+    },
+    scenarios: {
+        base: url + "/scenarios"
     }
 }

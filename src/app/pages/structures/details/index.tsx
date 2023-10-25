@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {CreateOrUpdateStructureRequest, StructureDetails, StructureDetailsField} from "../../../api/model/structures";
-import {endpoints} from "../../../api/endpoints/structures";
+import {endpoints} from "../../../api/endpoints/endpoints";
 import {formatDate} from "../../../utils";
 import {MaterialReactTable, MRT_ColumnDef, MRT_Row} from "material-react-table";
 import {

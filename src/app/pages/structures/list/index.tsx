@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {defaultPaginatedResponse, PaginatedResponse} from "../../../api/model/common";
-import {endpoints} from "../../../api/endpoints/structures";
+import {endpoints} from "../../../api/endpoints/endpoints";
 import {MaterialReactTable, type MRT_ColumnDef, MRT_Row} from "material-react-table";
 import {
     Box,
