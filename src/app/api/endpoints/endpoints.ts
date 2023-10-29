@@ -17,6 +17,9 @@ export const endpoints = {
         }
     },
     scenarios: {
-        base: url + "/scenarios"
+        base: url + "/scenarios",
+        withId: (id: string): string => {
+            return endpoints.scenarios.base + `/${id}`
+        },
     }
 }

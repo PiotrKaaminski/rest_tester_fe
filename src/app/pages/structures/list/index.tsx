@@ -149,72 +149,72 @@ export default function StructureList() {
 
     return (
         <div className={'m-5'}>
-            <MaterialReactTable
-                columns={columns}
-                data={data.rows}
-                enableHiding={false}
-                enableColumnActions={true}
-                enableDensityToggle={false}
-                enableFullScreenToggle={false}
-                enableGlobalFilter={false}
-                enableEditing={true}
-                state={{
-                    columnVisibility: {
-                        id: false
-                    }
-                }}
-                initialState={{
-                    showColumnFilters: true
-                }}
-                getRowId={(originalRow): string => {
-                    return originalRow.id
-                }}
-                positionActionsColumn="last"
-                displayColumnDefOptions={{
-                    'mrt-row-actions': {
-                        header: 'Akcje'
-                    }
-                }}
-                renderRowActions={({row }) => (
-                    <Box sx={{ display: 'flex', gap: '1rem'}}>
-                        <Tooltip title={"Edytuj"} arrow={true} placement={'left'}>
-                            <IconButton
-                                onClick={() => setModalState({
-                                    open: true,
-                                    reason: `UPDATE`,
-                                    onSubmit: (updatedStructure) => handleUpdateRow(updatedStructure, row.id),
-                                    currentName: row.original.name
-                                })}>
-                                <Edit />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title={"Usuń"} arrow={true} placement={'left'}>
-                            <IconButton
-                                // todo prawdopodobnie zamienić na modal zamiast confirm
-                                onClick={() => handleDeleteRow(row)}>
-                                <Delete/>
-                            </IconButton>
-                        </Tooltip>
-                    </Box>
-                )}
-                renderTopToolbarCustomActions={() => (
-                    <Button
-                        color={"success"}
-                        onClick={() => setModalState({
-                            open: true,
-                            reason: 'CREATE',
-                            onSubmit: handleCreateNewRow,
-                            currentName: ''
-                        })} variant={"contained"}>
-                        Dodaj strukturę
-                    </Button>
-                )}
-            />
-            <CreateOrUpdateModal
-                onClose={() => setModalState({...modalState, open: false})}
-                state={modalState}
-            />
-        </div>
+        <MaterialReactTable
+            columns={columns}
+            data={data.rows}
+            enableHiding={false}
+            enableColumnActions={true}
+            enableDensityToggle={false}
+            enableFullScreenToggle={false}
+            enableGlobalFilter={false}
+            enableEditing={true}
+            state={{
+                columnVisibility: {
+                    id: false
+                }
+            }}
+            initialState={{
+                showColumnFilters: true
+            }}
+            getRowId={(originalRow): string => {
+                return originalRow.id
+            }}
+            positionActionsColumn="last"
+            displayColumnDefOptions={{
+                'mrt-row-actions': {
+                    header: 'Akcje'
+                }
+            }}
+            renderRowActions={({row }) => (
+                <Box sx={{ display: 'flex', gap: '1rem'}}>
+                    <Tooltip title={"Edytuj"} arrow={true} placement={'left'}>
+                        <IconButton
+                            onClick={() => setModalState({
+                                open: true,
+                                reason: `UPDATE`,
+                                onSubmit: (updatedStructure) => handleUpdateRow(updatedStructure, row.id),
+                                currentName: row.original.name
+                            })}>
+                            <Edit />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={"Usuń"} arrow={true} placement={'left'}>
+                        <IconButton
+                            // todo prawdopodobnie zamienić na modal zamiast confirm
+                            onClick={() => handleDeleteRow(row)}>
+                            <Delete/>
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            )}
+            renderTopToolbarCustomActions={() => (
+                <Button
+                    color={"success"}
+                    onClick={() => setModalState({
+                        open: true,
+                        reason: 'CREATE',
+                        onSubmit: handleCreateNewRow,
+                        currentName: ''
+                    })} variant={"contained"}>
+                    Dodaj strukturę
+                </Button>
+            )}
+        />
+        <CreateOrUpdateModal
+            onClose={() => setModalState({...modalState, open: false})}
+            state={modalState}
+        />
+    </div>
     )
 }
 
