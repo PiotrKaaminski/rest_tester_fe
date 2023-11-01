@@ -1,3 +1,5 @@
+import {HttpMethod} from "./steps";
+
 export interface ScenarioInfo {
     id: string,
     name: string,
@@ -25,4 +27,22 @@ export enum ScenarioValidationError {
 
 export interface ScenarioValidationErrorResponse {
     status: ScenarioValidationError
+}
+
+export interface ScenarioDetails {
+    id: string,
+    name: string,
+    creationDate: string,
+    updateDate: string,
+    steps: ScenarioDetailsStep[]
+}
+
+export interface ScenarioDetailsStep {
+    id: string,
+    title: string,
+    method: HttpMethod,
+    endpoint: string,
+    sequence: number,
+    creationDate: string,
+    updateDate: string
 }

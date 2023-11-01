@@ -21,5 +21,33 @@ export const endpoints = {
         withId: (id: string): string => {
             return endpoints.scenarios.base + `/${id}`
         },
+    },
+    parameters: {
+        base: url + "/parameters",
+        withId: (id: string): string => {
+            return endpoints.parameters.base + `/${id}`
+        },
+        withScenarioPrefix: (scenarioId: string): string => {
+            return endpoints.scenarios.withId(scenarioId) + "/parameters"
+        }
+    },
+    steps: {
+        base: url + '/steps',
+        withId: (id: string): string => {
+            return endpoints.steps.base + `/${id}`
+        },
+        withScenarioPrefix: (scenarioId: string): string => {
+            return endpoints.scenarios.withId(scenarioId) + '/steps'
+        }
+    },
+    requests: {
+        withStepPrefix: (stepId: string): string => {
+            return endpoints.steps.withId(stepId) + '/request'
+        }
+    },
+    responses: {
+        withStepPrefix: (stepId: string): string => {
+            return endpoints.steps.withId(stepId) + '/response'
+        }
     }
 }

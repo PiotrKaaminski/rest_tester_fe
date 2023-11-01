@@ -1,3 +1,5 @@
 export {default as StructureDetailsView} from './structures/details'
 export {default as StructureList} from './structures/list'
 export {default as ScenarioList} from './scenarios/list'
+export {default as ScenarioDetailsView} from './scenarios/details'
+export {default as ScenarioStepView} from './scenarios/steps'

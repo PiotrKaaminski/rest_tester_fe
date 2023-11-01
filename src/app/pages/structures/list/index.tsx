@@ -54,7 +54,6 @@ export default function StructureList() {
             return {
                 onClick: () => {
                     navigate(`/structures/${row.id}`)
-                    console.log(row.id)
                 },
                 sx: {
                     cursor: 'pointer'

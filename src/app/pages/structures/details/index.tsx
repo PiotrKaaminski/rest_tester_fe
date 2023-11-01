@@ -134,7 +134,7 @@ export default function StructureDetailsView() {
 
     const handleDeleteField = async (row: MRT_Row<StructureDetailsField>)=> {
         // eslint-disable-next-line no-restricted-globals
-        if (!confirm(`Jesteś pewny, że chcesz usunąć polke ${row.original.name}?`)) {
+        if (!confirm(`Jesteś pewny, że chcesz usunąć pole ${row.original.name}?`)) {
             return;
         }
         await fetch(endpoints.structureFields.withId(row.id), {
