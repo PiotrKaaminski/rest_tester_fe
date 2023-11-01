@@ -1,5 +1,5 @@
 import {ParameterInfo} from "../../../api/model/parameters";
-import {StepRequestDetails, StepResponseDetails} from "../../../api/model/steps";
+import {StepResponseDetails} from "../../../api/model/steps";
 
 export interface ResponseDetailsProps {
     parameters: ParameterInfo[]

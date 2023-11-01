@@ -16,14 +16,14 @@ export default function ScenarioStepView() {
     const navigate = useNavigate();
     const [tab, setTab] = useState<TabIndex>('REQUEST')
 
-    const fetchStep = () => {
+    const fetchStep = async () => {
         if (!id) return
         fetch(endpoints.steps.withId(id))
             .then(response => response.json())
             .then(step => setStep(step))
     }
 
-    const fetchParameters = () => {
+    const fetchParameters = async () => {
         if (!step) return
         fetch(endpoints.parameters.withScenarioPrefix(step.scenario.id))
             .then(response => response.json())
@@ -32,7 +32,7 @@ export default function ScenarioStepView() {
 
     const fetchData = async () => {
         fetchStep()
-        fetchParameters()
+            .then(() => fetchParameters())
     }
 
     useEffect(() => {

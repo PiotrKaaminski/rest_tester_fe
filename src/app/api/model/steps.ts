@@ -1,4 +1,4 @@
-import {RequestFieldValueType} from "./request";
+import {RandomValue, RequestFieldValueType, StepRequestDetails} from "./request";
 
 export enum HttpMethod {
     GET = 'GET',
@@ -42,28 +42,6 @@ export interface StepDetails {
     },
     request: StepRequestDetails,
     response: StepResponseDetails
-}
-
-export interface StepRequestDetails {
-    id: string,
-    method: HttpMethod,
-    endpoint: string,
-    structure: StepStructureInfo | null,
-    fields: StepRequestField[] | null
-}
-
-export interface StepRequestField {
-    id: string,
-    name: string,
-    valueType: RequestFieldValueType,
-    strictValue: string | null,
-    parameterId: string | null,
-    randomValue: RandomValue | null
-}
-
-export interface RandomValue {
-    from: number,
-    to: number
 }
 
 export interface StepResponseDetails {
