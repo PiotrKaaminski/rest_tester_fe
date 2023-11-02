@@ -18,25 +18,16 @@ export default function ScenarioStepView() {
 
     const fetchStep = async () => {
         if (!id) return
-        fetch(endpoints.steps.withId(id))
-            .then(response => response.json())
-            .then(step => setStep(step))
-    }
-
-    const fetchParameters = async () => {
-        if (!step) return
-        fetch(endpoints.parameters.withScenarioPrefix(step.scenario.id))
-            .then(response => response.json())
-            .then(parameters => setParameters(parameters))
-    }
-
-    const fetchData = async () => {
-        fetchStep()
-            .then(() => fetchParameters())
+        const response = await fetch(endpoints.steps.withId(id))
+        const step = await response.json()
+        const parametersResponse = await fetch(endpoints.parameters.withScenarioPrefix(step.scenario.id))
+        const parameters = await parametersResponse.json()
+        setParameters(parameters)
+        setStep(step)
     }
 
     useEffect(() => {
-        fetchData()
+        fetchStep()
     }, []);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: TabIndex) => {
@@ -58,10 +49,10 @@ export default function ScenarioStepView() {
                         </Tabs>
                     </Box>
                     <CustomTabPanel index={'REQUEST'} selectedTab={tab}>
-                        <RequestDetailsView parameters={parameters} request={step?.request} stepId={id} refreshData={fetchData}/>
+                        <RequestDetailsView getParameters={() => parameters} request={step?.request} stepId={id} refreshData={fetchStep}/>
                     </CustomTabPanel>
                     <CustomTabPanel index={'RESPONSE'} selectedTab={tab}>
-                        <ResponseDetailsView parameters={parameters} response={step?.response} stepId={id} refreshData={fetchData}/>
+                        <ResponseDetailsView getParameters={() => parameters} response={step?.response} stepId={id} refreshData={fetchStep}/>
                     </CustomTabPanel>
                 </Box>
             </div>

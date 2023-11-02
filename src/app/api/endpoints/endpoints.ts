@@ -49,5 +49,17 @@ export const endpoints = {
         withStepPrefix: (stepId: string): string => {
             return endpoints.steps.withId(stepId) + '/response'
         }
+    },
+    requestFields: {
+        base: url + "/requestFields",
+        withId: (id: string): string => {
+            return endpoints.requestFields.base + `/${id}`
+        }
+    },
+    responseFields: {
+        base: url + "/responseFields",
+        withId: (id: string): string => {
+            return endpoints.requestFields.base + `/${id}`
+        }
     }
 }

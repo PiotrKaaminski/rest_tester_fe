@@ -5,7 +5,7 @@ import {
     RandomValue,
     RequestFieldValueType,
     StepRequestDetails,
-    StepRequestField,
+    StepRequestField, UpdateRequestFieldRequest,
     UpdateRequestRequest
 } from "../../../api/model/request";
 import MenuItem from "@mui/material/MenuItem";
@@ -30,7 +30,7 @@ import {Edit} from "@mui/icons-material";
 import {StructureFieldType} from "../../../api/model/structureField";
 
 export interface RequestDetailsProps {
-    parameters: ParameterInfo[]
+    getParameters: () => ParameterInfo[]
     request: StepRequestDetails | undefined,
     stepId: string | undefined,
     refreshData: () => any
@@ -45,7 +45,7 @@ const httpMethodStyleMap: Record<HttpMethod, string> = {
 }
 
 const requestFieldValueTypeNameMap: Record<RequestFieldValueType, string> = {
-    NULL: "NULL / Brak pola",
+    NULL: "NULL",
     PARAMETER: "Parametr",
     RANDOM: "Losowy",
     STRICT: "Dokładny"
@@ -68,19 +68,18 @@ export function RequestDetailsView(props: RequestDetailsProps) {
     })
 
     const {
-        parameters,
+        getParameters,
         stepId,
         refreshData
     } = props;
     useEffect(() => {
         setRequest(props.request)
         setNewEndpoint(props.request?.endpoint ?? '')
-        setModifyRequestFieldState({...modifyRequestFieldState, parameters: parameters})
+        setModifyRequestFieldState({...modifyRequestFieldState, parameters: getParameters()})
     }, [props.request]);
 
     const updateRequest = async (requestData: UpdateRequestRequest) => {
         if (!stepId) return
-        // todo pokazać błąd aktualizacji endpintu
         fetch(endpoints.requests.withStepPrefix(stepId), {
             method: 'PATCH',
             body: JSON.stringify(requestData),
@@ -110,7 +109,7 @@ export function RequestDetailsView(props: RequestDetailsProps) {
     }
 
     const findParameterNameById = (id: string): string => {
-        return parameters.find(value => value.id === id)?.name ?? ''
+        return getParameters().find(value => value.id === id)?.name ?? ''
     }
 
     const requestFieldColumns: MRT_ColumnDef<StepRequestField>[] = [
@@ -130,7 +129,7 @@ export function RequestDetailsView(props: RequestDetailsProps) {
         },
         {
             accessorFn: (field) => requestFieldValueTypeNameMap[field.valueType],
-            header: 'Typ porównania',
+            header: 'Typ wartości',
             enableColumnFilter: false
         },
         {
@@ -140,6 +139,11 @@ export function RequestDetailsView(props: RequestDetailsProps) {
         }
 
     ]
+
+    const closeUpdateFieldModal = () => {
+        setModifyRequestFieldState({...modifyRequestFieldState, open: false})
+        refreshData()
+    }
     return (
         <>
             <Select
@@ -226,6 +230,7 @@ export function RequestDetailsView(props: RequestDetailsProps) {
                                 <IconButton
                                     onClick={() => setModifyRequestFieldState({
                                         ...modifyRequestFieldState,
+                                        parameters: getParameters(),
                                         open: true,
                                         initialData: row.original
                                     })}>
@@ -243,8 +248,8 @@ export function RequestDetailsView(props: RequestDetailsProps) {
                 onClose={() => setOpenSelectStructureModal(false)}
             />
             <ModifyRequestFieldModal
-                parameters={parameters}
-                onClose={() => setModifyRequestFieldState({...modifyRequestFieldState, open: false})}
+                parameters={getParameters()}
+                onClose={closeUpdateFieldModal}
                 state={modifyRequestFieldState}
             />
         </>
@@ -280,8 +285,15 @@ const ModifyRequestFieldModal = ({
     }, [state.initialData]);
 
     const handleSubmit = () => {
-        // todo update field
-        onClose()
+        if (state.initialData === null) return
+        const request = new UpdateRequestFieldRequest(valueType, strictValue, parameterId, randomValue)
+        fetch(endpoints.requestFields.withId(state.initialData.id), {
+            method: 'PATCH',
+            body: JSON.stringify(request),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(() => onClose())
     }
 
     const handleTypeChange = (newType: RequestFieldValueType) => {
@@ -298,7 +310,6 @@ const ModifyRequestFieldModal = ({
                 break
             }
             case RequestFieldValueType.PARAMETER: {
-                console.log(state.parameters)
                 setStrictValue(null)
                 setRandomValue(null)
                 break
@@ -328,7 +339,6 @@ const ModifyRequestFieldModal = ({
     }
 
     const renderFormForParameterValue = () => {
-        // todo fix
         return (
             <Autocomplete
                 disablePortal
@@ -336,7 +346,7 @@ const ModifyRequestFieldModal = ({
                 getOptionLabel={(option) => option.name}
                 options={state.parameters}
                 onChange={(e, newParameter) =>
-                    console.log(newParameter === null ? 'null param id' : newParameter.id)
+                    setParameterId(newParameter === null ? null : newParameter.id)
                 }
             />
         )
