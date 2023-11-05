@@ -392,7 +392,7 @@ const ModifyRequestFieldModal = ({
 
     return (
         <Dialog open={state.open}>
-            <DialogTitle textAlign={'center'}>Aktualizacja wartośći</DialogTitle>
+            <DialogTitle textAlign={'center'}>Aktualizacja wartości</DialogTitle>
             <DialogContent>
                 <Stack
                     sx={{

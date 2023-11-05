@@ -28,6 +28,7 @@ import {
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {CreateOrUpdateStepRequest, StepValidationError, StepValidationErrorResponse} from "../../../api/model/steps";
+import {StartExecutionModal, StartExecutionModalState} from "../../exeuctions/startExecutionModal";
 
 interface ParameterFieldModalState {
     open: boolean
@@ -58,6 +59,10 @@ export default function ScenarioDetailsView() {
         reason: 'CREATE',
         onSubmit: async () => null,
         initialData: null
+    })
+    const [startExecutionModalState, setStartExecutionModalState] = useState<StartExecutionModalState>({
+        open: false,
+        scenarioId: id ?? ''
     })
     const navigate = useNavigate()
 
@@ -267,6 +272,16 @@ export default function ScenarioDetailsView() {
                 <div className={'d-flex justify-content-center'}>
                     <h2>{scenario?.name}</h2>
                 </div>
+                <Button
+                    color={'success'}
+                    variant={'contained'}
+                    onClick={() => setStartExecutionModalState({
+                        ...startExecutionModalState,
+                        open: true
+                    })}
+                >
+                    Uruchom scenariusz
+                </Button>
                 <ul className={'mt-4'}>
                     <li className={'mb-2'}><b>Data utworzenia:</b> {formatDate(scenario?.creationDate)}</li>
                     <li><b>Data aktualizacji:</b> {formatDate(scenario?.updateDate)}</li>
@@ -429,6 +444,10 @@ export default function ScenarioDetailsView() {
             <ScenarioModal
                 onClose={() => setStepModalState({...stepModalState, open: false})}
                 state={stepModalState}
+            />
+            <StartExecutionModal
+                state={startExecutionModalState}
+                onClose={() => setStartExecutionModalState({...startExecutionModalState, open: false})}
             />
         </>
     )

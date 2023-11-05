@@ -21,12 +21,13 @@ import {
     Tooltip
 } from "@mui/material";
 import {useNavigate} from "react-router-dom";
-import {Delete, Edit} from "@mui/icons-material";
+import {Delete, Edit, PlayArrow, Start} from "@mui/icons-material";
 import {
     CreateOrUpdateStructureRequest, StructureInfo,
     StructureValidationError,
     StructureValidationErrorResponse
 } from "../../../api/model/structures";
+import {StartExecutionModal, StartExecutionModalState} from "../../exeuctions/startExecutionModal";
 
 interface ModalState {
     open: boolean
@@ -43,6 +44,11 @@ export default function ScenarioList() {
         currentName: ''
     })
     const [data, setData] = useState<PaginatedResponse<ScenarioInfo>>(defaultPaginatedResponse<ScenarioInfo>);
+    const [startExecutionModalState, setStartExecutionModalState] = useState<StartExecutionModalState>({
+        open: false,
+        scenarioId: ''
+    })
+
     const navigate = useNavigate();
 
     const fetchData = async () => {
@@ -190,6 +196,17 @@ export default function ScenarioList() {
                 }}
                 renderRowActions={({row }) => (
                     <Box sx={{ display: 'flex', gap: '1rem'}}>
+                        <Tooltip title={"Uruchom"} arrow={true} placement={'left'}>
+                            <IconButton
+                                onClick={() => setStartExecutionModalState({
+                                    ...startExecutionModalState,
+                                    open: true,
+                                    scenarioId: row.id
+                                })}
+                            >
+                                <PlayArrow/>
+                            </IconButton>
+                        </Tooltip>
                         <Tooltip title={"Edytuj"} arrow={true} placement={'left'}>
                             <IconButton
                                 onClick={() => setModalState({
@@ -228,6 +245,10 @@ export default function ScenarioList() {
             <CreateOrUpdateModal
                 onClose={() => setModalState({...modalState, open: false})}
                 state={modalState}
+            />
+            <StartExecutionModal
+                state={startExecutionModalState}
+                onClose={() => setStartExecutionModalState({...startExecutionModalState, open: false})}
             />
         </div>
     )

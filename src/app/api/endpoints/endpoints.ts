@@ -61,5 +61,10 @@ export const endpoints = {
         withId: (id: string): string => {
             return endpoints.responseFields.base + `/${id}`
         }
+    },
+    executions: {
+        withScenarioPrefix: (scenarioId: string): string => {
+            return endpoints.scenarios.withId(scenarioId) + '/execute'
+        }
     }
 }
