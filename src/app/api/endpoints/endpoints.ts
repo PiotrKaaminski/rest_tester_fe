@@ -59,7 +59,7 @@ export const endpoints = {
     responseFields: {
         base: url + "/responseFields",
         withId: (id: string): string => {
-            return endpoints.requestFields.base + `/${id}`
+            return endpoints.responseFields.base + `/${id}`
         }
     }
 }

@@ -248,7 +248,6 @@ export function RequestDetailsView(props: RequestDetailsProps) {
                 onClose={() => setOpenSelectStructureModal(false)}
             />
             <ModifyRequestFieldModal
-                parameters={getParameters()}
                 onClose={closeUpdateFieldModal}
                 state={modifyRequestFieldState}
             />
@@ -259,7 +258,6 @@ export function RequestDetailsView(props: RequestDetailsProps) {
 interface ModifyRequestFieldModalProps {
     onClose: () => void
     state: ModifyRequestFieldModalState
-    parameters: ParameterInfo[]
 }
 
 interface ModifyRequestFieldModalState{
@@ -394,7 +392,7 @@ const ModifyRequestFieldModal = ({
 
     return (
         <Dialog open={state.open}>
-            <DialogTitle textAlign={'center'}>Aktualizacja porównania</DialogTitle>
+            <DialogTitle textAlign={'center'}>Aktualizacja wartośći</DialogTitle>
             <DialogContent>
                 <Stack
                     sx={{

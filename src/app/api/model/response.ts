@@ -36,3 +36,19 @@ export class UpdateResponseRequest {
         this.structureId = structureId;
     }
 }
+
+export class UpdateResponseFieldRequest {
+    valueType: ResponseFieldValueType
+    strictValue: string | null
+    parameterIdToRead: string | null
+    saveToParameter: boolean
+    parameterIdToSave: string | null
+
+    constructor(valueType: ResponseFieldValueType, strictValue: string | null, parameterIdToRead: string | null, saveToParameter: boolean, parameterIdToSave: string | null) {
+        this.valueType = valueType;
+        this.strictValue = strictValue;
+        this.parameterIdToRead = parameterIdToRead;
+        this.saveToParameter = saveToParameter;
+        this.parameterIdToSave = parameterIdToSave;
+    }
+}
