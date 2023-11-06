@@ -13,11 +13,11 @@ const executionStatusNameMap: Record<ExecutionStatus, string> = {
     FAILED: "Błąd"
 
 }
+
 const statusColumnColorMap: Record<ExecutionStatus, string> = {
     PENDING: 'orange',
     SUCCESS: "green",
     FAILED: "red"
-
 }
 
 export default function ExecutionList() {

@@ -1,5 +1,5 @@
-export function formatDate(date: string | undefined): string {
-    if (date === undefined) {
+export function formatDate(date: string | undefined | null): string {
+    if (date === undefined || date === null) {
         return '-'
     }
     return new Date(date).toLocaleString([], {

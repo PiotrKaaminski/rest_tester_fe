@@ -66,6 +66,9 @@ export const endpoints = {
         base: url + "/executions",
         withScenarioPrefix: (scenarioId: string): string => {
             return endpoints.scenarios.withId(scenarioId) + '/execute'
+        },
+        withId: (id: string): string => {
+            return endpoints.executions.base + `/${id}`
         }
     }
 }
