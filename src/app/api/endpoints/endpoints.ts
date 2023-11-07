@@ -70,5 +70,11 @@ export const endpoints = {
         withId: (id: string): string => {
             return endpoints.executions.base + `/${id}`
         }
+    },
+    executionSteps: {
+        base: url + "/executionSteps",
+        withId: (id: string): string => {
+            return endpoints.executionSteps.base + `/${id}`
+        }
     }
 }

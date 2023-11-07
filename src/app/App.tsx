@@ -11,7 +11,7 @@ import {
 
 import {
     ExecutionDetailsView,
-    ExecutionList,
+    ExecutionList, ExecutionStepView,
     ScenarioDetailsView,
     ScenarioList,
     ScenarioStepView,
@@ -31,6 +31,7 @@ function App() {
                 <Route path="/structures/:id" element={<StructureDetailsView/>}/>
                 <Route path="/" element={<ExecutionList/>}/>
                 <Route path="/executions/:id" element={<ExecutionDetailsView/>}/>
+                <Route path="/executions/steps/:id" element={<ExecutionStepView/>}/>
             </Routes>
         </BrowserRouter>
     );
