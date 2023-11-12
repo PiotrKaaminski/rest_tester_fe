@@ -65,7 +65,7 @@ export interface ExecutionResponse {
     expectedHttpStatus: number
     actualHttpStatus: number | null
     structureName: string | null
-    field: ExecutionResponseField[]
+    fields: ExecutionResponseField[]
 }
 
 export interface ExecutionResponseField {
