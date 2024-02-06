@@ -99,7 +99,7 @@ export default function ExecutionDetailsView() {
         {
             accessorFn: field => formatDate(field.executionDate),
             muiTableBodyCellProps: ({ row }) => onClickNavigateToStepDetails(row),
-            header: 'Data utworzenia',
+            header: 'Data wykonania',
             enableColumnFilter: false,
         },
         {
@@ -133,7 +133,7 @@ export default function ExecutionDetailsView() {
                 </div>
                 <ul className={'mt-4'}>
                     <li className={'mb-2'}><b>Data utworzenia:</b> {formatDate(execution?.startDate)}</li>
-                    <li><b>Data aktualizacji:</b> {formatDate(execution?.finishDate)}</li>
+                    <li><b>Data końca:</b> {formatDate(execution?.finishDate)}</li>
                 </ul>
                 <h4 className={'mt-4'}>
                     Kroki scenariusza:
