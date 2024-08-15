@@ -26,11 +26,6 @@ import {Edit} from "@mui/icons-material";
 import {StructureFieldType} from "../../../api/model/structureField";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import {
-    AutocompleteChangeDetails,
-    AutocompleteChangeReason,
-    AutocompleteValue
-} from "@mui/base/useAutocomplete/useAutocomplete";
 
 export interface ResponseDetailsProps {
     getParameters: () => ParameterInfo[]
